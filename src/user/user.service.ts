@@ -1,9 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserRepository } from './user.repositiry';
 import { AddUserDto } from './dto/add-user.dto';
 import { User } from './user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateResult } from 'typeorm';
+import { promisify } from "util";
+import { LoginDto } from '../auth/dto/login.dto';
 
 @Injectable()
 export class UserService {
@@ -16,11 +19,12 @@ export class UserService {
   }
 
   async deleteUser(userId: string) {
-    return this.userRepository.deleteUser(userId);
+    return this.userRepository.delete(userId);
   }
 
-  async updateUser(updateUserDto: UpdateUserDto): Promise<User> {
-    return this.userRepository.updateUser(updateUserDto);
+  async updateUser(updateUserDto: UpdateUserDto): Promise<UpdateResult> {
+    const {img_path, email, name, id} = updateUserDto;
+    return this.userRepository.update(id, {img_path, email, name});
   }
 
   async getAllUsers(): Promise<User[]> {
@@ -28,6 +32,10 @@ export class UserService {
   }
 
   async getUser(userId: string): Promise<User> {
-    return await this.userRepository.findOne(userId);
+    return this.userRepository.findOne(userId);
+  }
+
+  async getUserByEmail(email: string): Promise<User> {
+    return this.userRepository.findOne({ email });
   }
 }

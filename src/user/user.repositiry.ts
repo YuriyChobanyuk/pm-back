@@ -12,14 +12,11 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UserRepository extends Repository<User> {
   async addUser(addUserDto: AddUserDto): Promise<User> {
     try {
-      const { email, img_path, name, password, role } = addUserDto;
-      const user = new User();
-
-      user.name = name;
-      user.password = await this.hashPassword(password);
-      user.email = email;
-      user.role = role;
-      user.img_path = img_path;
+      const hashedPassword = await this.hashPassword(addUserDto.password);
+      const user = this.create({
+        ...addUserDto,
+        password: hashedPassword,
+      });
 
       await user.save();
 
@@ -32,52 +29,6 @@ export class UserRepository extends Repository<User> {
         throw new InternalServerErrorException();
       }
     }
-  }
-
-  async deleteUser(userId: string): Promise<void> {
-    try {
-      await this.createQueryBuilder('public."user"')
-        .delete()
-        .where('"user".id = :userId', {
-          userId,
-        })
-        .execute();
-    } catch (e) {
-      console.error(e);
-      throw new InternalServerErrorException('Delete user error');
-    }
-  }
-
-  async updateUser(updateUserDto: UpdateUserDto): Promise<User> {
-    const { email, id, img_path, name, password } = updateUserDto;
-    try {
-      const user = await this.findOne(id, {
-        select: ['password', 'img_path', 'name', 'email']
-      });
-
-      let newPassword: string;
-      if (password) {
-        newPassword = await this.hashPassword(password);
-      }
-
-      user.email = email || user.email;
-      user.img_path = img_path || user.img_path;
-      user.name = name || user.name;
-      user.password = newPassword || user.password;
-
-      const updatedUser = await user.save();
-      return this.sanitizeUser(updatedUser);
-    } catch (e) {
-      console.error(e);
-      throw new InternalServerErrorException('Update user error');
-    }
-  }
-
-  private sanitizeUser(user: User) {
-    delete user.password;
-    delete user.created_at;
-    delete user.active;
-    return user;
   }
 
   private async hashPassword(password: string): Promise<string> {

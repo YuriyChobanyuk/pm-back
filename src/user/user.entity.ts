@@ -6,6 +6,7 @@ import {
   Column,
 } from 'typeorm';
 import { UserRole } from './user-role.enum';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class User extends BaseEntity {
@@ -13,50 +14,50 @@ export class User extends BaseEntity {
   id: string;
 
   @Column({
-    type: "varchar",
-    length: 255
+    type: 'varchar',
+    length: 255,
   })
   name: string;
 
+  @Exclude()
   @Column({
-    type: "varchar",
+    type: 'varchar',
     length: 255,
-    select: false
   })
   password: string;
 
   @Column({
-    type: "varchar",
+    type: 'varchar',
     length: 255,
     unique: true,
   })
   email: string;
 
   @Column({
-    type: "varchar",
+    type: 'varchar',
     length: 20,
-    default: UserRole.USER
+    default: UserRole.USER,
   })
   role: UserRole;
 
+  @Exclude()
   @CreateDateColumn({
     type: 'timestamp',
-    select: false
   })
   created_at: Date;
 
+  @Exclude()
   @Column({
-    type: "varchar",
+    type: 'varchar',
     length: 255,
     default: true,
-    select: false
   })
   active: boolean;
 
   @Column({
     type: 'varchar',
     length: 255,
-    default: null
+    default: null,
   })
   img_path: string;
 }
