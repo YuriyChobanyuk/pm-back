@@ -3,10 +3,11 @@ import {
   Entity,
   CreateDateColumn,
   PrimaryGeneratedColumn,
-  Column,
+  Column, OneToMany,
 } from 'typeorm';
 import { UserRole } from './user-role.enum';
 import { Exclude } from 'class-transformer';
+import { Note } from '../notes/note.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -48,8 +49,7 @@ export class User extends BaseEntity {
 
   @Exclude()
   @Column({
-    type: 'varchar',
-    length: 255,
+    type: 'boolean',
     default: true,
   })
   active: boolean;
@@ -60,4 +60,7 @@ export class User extends BaseEntity {
     default: null,
   })
   img_path: string;
+
+  @OneToMany(type => Note, note => note.user)
+  notes: Note[]
 }
