@@ -1,8 +1,12 @@
 import { EntityRepository, Repository } from 'typeorm';
 import { Note } from './note.entity';
-import AddNoteDto from './dto/addNote.dto';
-import { InternalServerErrorException } from '@nestjs/common';
+import AddNoteDto from './dto/add-note.dto';
+import {
+  InternalServerErrorException,
+  BadRequestException,
+} from '@nestjs/common';
 import { User } from '../user/user.entity';
+import UpdateNoteDto from './dto/update-note.dto';
 
 @EntityRepository(Note)
 class NotesRepository extends Repository<Note> {
@@ -22,12 +26,25 @@ class NotesRepository extends Repository<Note> {
 
   async getNotes(user: User): Promise<Note[]> {
     try {
-      return this.find({ user });
+      return this.find({ user, active: true });
     } catch (e) {
       console.error(e);
 
       throw new InternalServerErrorException(e);
     }
+  }
+
+  async updateNote(updateNoteDto: UpdateNoteDto, user: User) {
+    const note = await this.update(
+      { user, id: updateNoteDto.id },
+      updateNoteDto,
+    );
+
+    if (!note || !note.affected) {
+      throw new BadRequestException('No notes were found');
+    }
+
+    return true;
   }
 }
 

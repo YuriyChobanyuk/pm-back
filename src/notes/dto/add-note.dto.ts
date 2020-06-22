@@ -1,5 +1,4 @@
-import { IsEnum, IsString, MaxLength } from 'class-validator';
-import NoteTag from '../NoteTag.enum';
+import { IsString, MaxLength } from 'class-validator';
 
 class AddNoteDto {
   @IsString()
@@ -11,10 +10,10 @@ class AddNoteDto {
   @IsString()
   text: string;
 
-  @IsEnum(NoteTag, {
+  @IsString({
     each: true,
   })
-  tags: NoteTag[];
+  tags: string[];
 }
 
 export default AddNoteDto;

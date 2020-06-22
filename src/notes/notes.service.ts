@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import AddNoteDto from './dto/addNote.dto';
+import AddNoteDto from './dto/add-note.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import NotesRepository from './notes.repository';
 import { Note } from './note.entity';
 import { User } from '../user/user.entity';
+import UpdateNoteDto from './dto/update-note.dto';
 
 @Injectable()
 export class NotesService {
@@ -17,6 +18,13 @@ export class NotesService {
 
   async getNotes(user: User): Promise<Note[]> {
     return this.notesRepository.getNotes(user);
+  }
+
+  async updateNotes(
+    updateNoteDto: UpdateNoteDto,
+    user: User,
+  ): Promise<boolean> {
+    return this.notesRepository.updateNote(updateNoteDto, user);
   }
 }
 

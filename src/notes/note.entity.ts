@@ -6,7 +6,6 @@ import {
   Column,
   ManyToOne,
 } from 'typeorm';
-import NoteTag from './NoteTag.enum';
 import { Exclude } from 'class-transformer';
 import { User } from '../user/user.entity';
 
@@ -21,26 +20,23 @@ export class Note extends BaseEntity {
   })
   title: string;
 
-  @Exclude()
   @Column({
     type: 'text',
   })
   text: string;
 
   @Column({
-    type: 'enum',
-    enum: NoteTag,
+    type: 'text',
     array: true,
-    default: [],
+    default: '{}',
   })
-  tags: NoteTag[];
+  tags: string[];
 
   @CreateDateColumn({
     type: 'timestamp',
   })
   creationDate: Date;
 
-  @Exclude()
   @Column({
     type: 'boolean',
     default: true,
@@ -49,7 +45,7 @@ export class Note extends BaseEntity {
 
   @Exclude()
   @ManyToOne(
-    type => User,
+    () => User,
     user => user.notes,
   )
   user: User;

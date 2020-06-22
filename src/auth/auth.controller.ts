@@ -54,10 +54,7 @@ export class AuthController {
     try {
       user = await this.authService.refresh(refreshToken);
     } catch (e) {
-      return res
-        .clearCookie('refreshToken')
-        .status(401)
-        .send('Invalid refresh token');
+      return res.status(401).send('Invalid refresh token');
     }
 
     return this.sendToken(res, user);
