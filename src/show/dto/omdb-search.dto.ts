@@ -1,4 +1,5 @@
-import { IsString } from 'class-validator';
+import { IsString, IsEnum } from 'class-validator';
+import { ShowType } from '../show-type.enum';
 
 export class OmdbSearchDto {
   @IsString()
@@ -10,6 +11,6 @@ export class OmdbSearchDto {
   @IsString()
   imdbId: string;
 
-  @IsString()
-  type: string;
+  @IsEnum(ShowType)
+  type: ShowType;
 }

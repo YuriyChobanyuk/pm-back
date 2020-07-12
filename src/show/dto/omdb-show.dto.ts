@@ -1,4 +1,12 @@
-import { IsString, IsDate, IsUrl, IsNumber } from 'class-validator';
+import {
+  IsString,
+  IsDate,
+  IsUrl,
+  IsNumber,
+  IsEnum,
+  IsOptional,
+} from 'class-validator';
+import { ShowType } from '../show-type.enum';
 
 export class OmdbShowDto {
   @IsString()
@@ -30,9 +38,10 @@ export class OmdbShowDto {
   @IsString()
   imdbId: string;
 
-  @IsString()
-  type: string;
+  @IsEnum(ShowType)
+  type: ShowType;
 
   @IsNumber()
-  totalSeasons: number;
+  @IsOptional()
+  totalSeasons?: number;
 }
