@@ -15,7 +15,6 @@ import { JwtPayloadInterface } from './jwt-payload.interface';
 import { Request, Response } from 'express';
 import { plainToClass } from 'class-transformer';
 import { User } from '../user/user.entity';
-import { refreshTokenCookieOptions } from '../common/options';
 import { LoginDto } from './dto/login.dto';
 
 @Controller('api/v1/auth')
@@ -72,7 +71,11 @@ export class AuthController {
     const token = this.jwtService.sign(payload);
     const refreshToken = this.authService.generateRefreshToken(payload);
     return res
-      .cookie('refreshToken', refreshToken, refreshTokenCookieOptions)
+      .cookie(
+        'refreshToken',
+        refreshToken,
+        this.authService.refreshTokenCookieOptions,
+      )
       .status(200)
       .json({
         token,

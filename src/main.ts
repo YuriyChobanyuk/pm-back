@@ -1,10 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { appConf } from './config';
 import * as cookieParser from 'cookie-parser';
 import * as helmet from 'helmet';
 import * as rateLimit from 'express-rate-limit';
 import morgan = require('morgan');
+import { AppConfigService } from './app-config/app-config.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -17,6 +17,8 @@ async function bootstrap() {
       allowedHeaders: ['Accept', 'Content-Type', 'Authorization'],
     },
   });
+
+  const configService = app.get(AppConfigService);
 
   app.use(helmet());
 
@@ -41,6 +43,6 @@ async function bootstrap() {
 
   app.use(morgan('dev'));
 
-  await app.listen(appConf.PORT);
+  await app.listen(configService.applicationConfig.port);
 }
 bootstrap();

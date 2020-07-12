@@ -1,12 +1,11 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/camelcase */
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserRepository } from './user.repositiry';
 import { AddUserDto } from './dto/add-user.dto';
 import { User } from './user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdateResult } from 'typeorm';
-import { promisify } from "util";
-import { LoginDto } from '../auth/dto/login.dto';
 
 @Injectable()
 export class UserService {
@@ -23,8 +22,8 @@ export class UserService {
   }
 
   async updateUser(updateUserDto: UpdateUserDto): Promise<UpdateResult> {
-    const {img_path, email, name, id} = updateUserDto;
-    return this.userRepository.update(id, {img_path, email, name});
+    const { img_path, email, name, id } = updateUserDto;
+    return this.userRepository.update(id, { img_path, email, name });
   }
 
   async getAllUsers(): Promise<User[]> {

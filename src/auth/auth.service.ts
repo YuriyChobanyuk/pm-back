@@ -7,13 +7,17 @@ import { AddUserDto } from '../user/dto/add-user.dto';
 import { User } from '../user/user.entity';
 import { JwtPayloadInterface } from './jwt-payload.interface';
 import * as jwt from 'jsonwebtoken';
-import { appConf } from '../config';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcryptjs';
+import { AppConfigService } from 'src/app-config/app-config.service';
+import { API_V1 } from 'src/common/constants';
 
 @Injectable()
 export class AuthService {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private configService: AppConfigService,
+  ) {}
 
   async signUp(signUpDto: SignUpDto): Promise<User> {
     const addUserDto = plainToClass(AddUserDto, {
@@ -57,18 +61,30 @@ export class AuthService {
   }
 
   generateRefreshToken(payload: JwtPayloadInterface): string {
-    return jwt.sign(payload, appConf.JWT_REFRESH_SECRET, {
-      expiresIn: appConf.JWT_REFRESH_EXPIRES_IN,
+    return jwt.sign(payload, this.configService.jwtConfig.secret, {
+      expiresIn: this.configService.jwtConfig.expiresIn,
     });
   }
 
   verifyRefreshToken(refreshToken: string): JwtPayloadInterface {
     try {
-      jwt.verify(refreshToken, appConf.JWT_REFRESH_SECRET);
+      jwt.verify(refreshToken, this.configService.jwtConfig.refreshSecret);
     } catch (e) {
       throw new UnauthorizedException();
     }
 
     return jwt.decode(refreshToken) as JwtPayloadInterface;
+  }
+
+  get refreshTokenCookieOptions() {
+    return {
+      maxAge: this.configService.jwtConfig.refreshExpiresIn * 1000,
+      expireAfterSeconds: this.configService.jwtConfig.refreshExpiresIn * 1000,
+      httpOnly: true,
+      // should be set to true in real production
+      secure: false,
+      domain: this.configService.applicationConfig.domain,
+      path: `${API_V1}/auth`,
+    };
   }
 }
