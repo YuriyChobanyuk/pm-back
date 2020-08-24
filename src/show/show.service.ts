@@ -1,97 +1,31 @@
-import { OmdbShowResponseDto } from './dto/omdb-show-response.dto';
-import { OmdbGetByIdQueryDto } from './dto/omdb-get-by-id-query.dto';
-import { OmdbSearchQueryDto } from './dto/omdb-search-query.dto';
 import {
+  ConflictException,
   Injectable,
-  HttpService,
-  InternalServerErrorException,
 } from '@nestjs/common';
-import { OmdbSearchResponseDto } from './dto/omdb-search-response.dto';
-import { OmdbSearchDto } from './dto/omdb-search.dto';
-import { OMDB_API_URL } from 'src/common/constants';
+
+import { ShowRepository } from './show.repository';
+import { InjectRepository } from '@nestjs/typeorm';
 import { AppConfigService } from 'src/app-config/app-config.service';
-import { map } from 'rxjs/operators';
-import { OmdbShowDto } from './dto/omdb-show.dto';
-import { classToPlain, plainToClass } from 'class-transformer';
+import { AddShowDto } from './dto/add-show.dto';
+import { Show } from './show.entity';
 
 @Injectable()
 export class ShowService {
   constructor(
     private configService: AppConfigService,
-    private httpService: HttpService,
+    @InjectRepository(ShowRepository) private showRepository: ShowRepository,
   ) {}
 
-  async performSearchRequest(
-    searchQuery: OmdbSearchQueryDto,
-  ): Promise<OmdbSearchDto[]> {
-    try {
-      const searchResults = await this.httpService
-        .get(OMDB_API_URL, {
-          params: {
-            apiKey: this.configService.omdbConfig.apiKey,
-            ...searchQuery,
-          },
-        })
-        .pipe(
-          map(response => {
-            return this.transformSearchOmdbShowResponse(
-              plainToClass(OmdbSearchResponseDto, response.data),
-            );
-          }),
-        )
-        .toPromise();
 
-      return searchResults;
-    } catch (e) {
-      throw new InternalServerErrorException('Failed fetch data from source');
+  public async addShow(addShowDto: AddShowDto): Promise<Show> {
+    const existingShow = await this.showRepository.getShowByTitle(
+      addShowDto.title,
+    );
+
+    if (existingShow) {
+      throw new ConflictException('Show with this title already exists');
     }
-  }
 
-  async performGetShowByIdRequest(
-    getByIdQuery: OmdbGetByIdQueryDto,
-  ): Promise<OmdbShowDto> {
-    try {
-      const omdbShow = await this.httpService
-        .get(OMDB_API_URL, {
-          params: {
-            apiKey: this.configService.omdbConfig.apiKey,
-            ...getByIdQuery,
-          },
-        })
-        .pipe(
-          map(response => {
-            return this.transformOmdbShowResponse(
-              plainToClass(OmdbShowResponseDto, response.data),
-            );
-          }),
-        )
-        .toPromise();
-
-      return omdbShow;
-    } catch (e) {
-      throw new InternalServerErrorException(
-        `Failed fetch data from source: ${e}`,
-      );
-    }
-  }
-
-  transformSearchOmdbShowResponse(
-    searchResponse: OmdbSearchResponseDto,
-  ): OmdbSearchDto[] {
-    return searchResponse.Search.map(data =>
-      classToPlain(data, {
-        strategy: 'excludeAll',
-      }),
-    ).map(plain => plainToClass(OmdbSearchDto, plain));
-  }
-
-  transformOmdbShowResponse(
-    omdbShowResponse: OmdbShowResponseDto,
-  ): OmdbShowDto {
-    const plain = classToPlain(omdbShowResponse, {
-      strategy: 'excludeAll',
-    });
-
-    return plainToClass(OmdbShowDto, plain);
+    return this.showRepository.addShow(addShowDto);
   }
 }

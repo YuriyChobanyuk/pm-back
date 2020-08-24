@@ -9,6 +9,7 @@ import { ShowModule } from './show/show.module';
 import { AppConfigModule } from './app-config/app-config.module';
 import { AppConfigService } from './app-config/app-config.service';
 import { getDBConfig } from './common/db-config';
+import { OmdbModule } from './omdb/omdb.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { getDBConfig } from './common/db-config';
     AuthModule,
     NotesModule,
     ShowModule,
+    OmdbModule,
   ],
   controllers: [AppController],
   providers: [AppService],

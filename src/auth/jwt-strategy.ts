@@ -10,7 +10,7 @@ import { AppConfigService } from 'src/app-config/app-config.service';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     private userService: UserService,
-    private configService: AppConfigService,
+    configService: AppConfigService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -20,7 +20,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: JwtPayloadInterface): Promise<User> {
     const { userId } = payload;
-    console.log({ payload });
 
     const user = await this.userService.getUser(userId);
 

@@ -3,6 +3,8 @@
     "OMDB",
     "imdb",
     "nestjs",
-    "signup"
+    "signup",
+    "typeorm",
+    "varchar"
   ]
 }

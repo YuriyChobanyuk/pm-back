@@ -7,7 +7,9 @@ import {
   Param,
   Get,
   Put,
-  UseInterceptors, ClassSerializerInterceptor, UseGuards,
+  UseInterceptors,
+  ClassSerializerInterceptor,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AddUserDto } from './dto/add-user.dto';
@@ -20,8 +22,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 @UseGuards(JwtAuthGuard)
 @Controller(`${API_V1}/users`)
 export class UserController {
-  constructor(private userService: UserService) {
-  }
+  constructor(private userService: UserService) {}
 
   @UseGuards(AdminGuard)
   @UseInterceptors(ClassSerializerInterceptor)

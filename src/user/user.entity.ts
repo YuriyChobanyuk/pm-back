@@ -1,9 +1,11 @@
+import { ShowToUser } from './../show/showToUser.entity';
 import {
   BaseEntity,
   Entity,
   CreateDateColumn,
   PrimaryGeneratedColumn,
-  Column, OneToMany,
+  Column,
+  OneToMany,
 } from 'typeorm';
 import { UserRole } from './user-role.enum';
 import { Exclude } from 'class-transformer';
@@ -61,6 +63,15 @@ export class User extends BaseEntity {
   })
   img_path: string;
 
-  @OneToMany(type => Note, note => note.user)
-  notes: Note[]
+  @OneToMany(
+    () => Note,
+    note => note.user,
+  )
+  notes: Note[];
+
+  @OneToMany(
+    () => ShowToUser,
+    showToUser => showToUser.user,
+  )
+  showToUser: ShowToUser;
 }

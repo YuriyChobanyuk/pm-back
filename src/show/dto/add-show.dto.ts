@@ -1,22 +1,21 @@
 import {
+  IsDateString,
   IsString,
-  IsDate,
   IsUrl,
   IsNumber,
   IsEnum,
   IsOptional,
 } from 'class-validator';
 import { ShowType } from '../show-type.enum';
-import { ShowStatus } from '../show-status.enum';
 
-export class OmdbShowDto {
+export class AddShowDto {
   @IsString()
   title: string;
 
   @IsString()
   year: string;
 
-  @IsDate()
+  @IsDateString()
   released: Date;
 
   @IsString({
@@ -47,7 +46,4 @@ export class OmdbShowDto {
   @IsNumber()
   @IsOptional()
   totalSeasons?: number;
-
-  @IsEnum(ShowStatus)
-  status: string;
 }
