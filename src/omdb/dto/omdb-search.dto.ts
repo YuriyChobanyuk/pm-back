@@ -1,5 +1,5 @@
 import { IsString, IsEnum } from 'class-validator';
-import { ShowType } from '../show-type.enum';
+import { ShowType } from '../../show/show-type.enum';
 
 export class OmdbSearchDto {
   @IsString()

@@ -16,12 +16,15 @@ import { Request, Response } from 'express';
 import { plainToClass } from 'class-transformer';
 import { User } from '../user/user.entity';
 import { LoginDto } from './dto/login.dto';
+import * as jwt from 'jsonwebtoken';
+import { AppConfigService } from '../app-config/app-config.service';
 
 @Controller('api/v1/auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
     private jwtService: JwtService,
+    private configService: AppConfigService,
   ) {}
 
   @Post('/signup')
@@ -68,8 +71,13 @@ export class AuthController {
       name,
     };
 
-    const token = this.jwtService.sign(payload);
+    const token = this.jwtService.sign(payload, {});
     const refreshToken = this.authService.generateRefreshToken(payload);
+    try {
+      jwt.verify(refreshToken, this.configService.jwtConfig.refreshSecret);
+    } catch (e) {
+      throw new UnauthorizedException();
+    }
     return res
       .cookie(
         'refreshToken',

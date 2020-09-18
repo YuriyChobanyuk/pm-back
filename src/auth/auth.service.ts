@@ -11,12 +11,14 @@ import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcryptjs';
 import { AppConfigService } from 'src/app-config/app-config.service';
 import { API_V1 } from 'src/common/constants';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UserService,
     private configService: AppConfigService,
+    private jwtService: JwtService,
   ) {}
 
   async signUp(signUpDto: SignUpDto): Promise<User> {
@@ -61,7 +63,7 @@ export class AuthService {
   }
 
   generateRefreshToken(payload: JwtPayloadInterface): string {
-    return jwt.sign(payload, this.configService.jwtConfig.secret, {
+    return jwt.sign(payload, this.configService.jwtConfig.refreshSecret, {
       expiresIn: this.configService.jwtConfig.expiresIn,
     });
   }
@@ -80,11 +82,12 @@ export class AuthService {
     return {
       maxAge: this.configService.jwtConfig.refreshExpiresIn * 1000,
       expireAfterSeconds: this.configService.jwtConfig.refreshExpiresIn * 1000,
-      httpOnly: true,
+      httpOnly: false,
       // should be set to true in real production
       secure: false,
-      domain: this.configService.applicationConfig.domain,
-      path: `${API_V1}/auth`,
+      // domain: this.configService.applicationConfig.domain,
+      domain: null,
+      // path: `${API_V1}/auth`,
     };
   }
 }

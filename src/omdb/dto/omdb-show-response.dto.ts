@@ -1,4 +1,4 @@
-import { ShowType } from './../show-type.enum';
+import { ShowType } from '../../show/show-type.enum';
 import { Expose, Transform, Type } from 'class-transformer';
 
 export class OmdbShowResponseDto {

@@ -3,15 +3,15 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { OmdbSearchQueryDto } from '../show/dto/omdb-search-query.dto';
-import { OmdbSearchDto } from '../show/dto/omdb-search.dto';
-import { OmdbGetByIdQueryDto } from '../show/dto/omdb-get-by-id-query.dto';
-import { OmdbShowDto } from '../show/dto/omdb-show.dto';
+import { OmdbSearchQueryDto } from './dto/omdb-search-query.dto';
+import { OmdbSearchDto } from './dto/omdb-search.dto';
+import { OmdbGetByIdQueryDto } from './dto/omdb-get-by-id-query.dto';
+import { OmdbShowDto } from './dto/omdb-show.dto';
 import { OMDB_API_URL } from '../common/constants';
 import { map } from 'rxjs/operators';
 import { classToPlain, plainToClass } from 'class-transformer';
-import { OmdbShowResponseDto } from '../show/dto/omdb-show-response.dto';
-import { OmdbSearchResponseDto } from '../show/dto/omdb-search-response.dto';
+import { OmdbShowResponseDto } from './dto/omdb-show-response.dto';
+import { OmdbSearchResponseDto } from './dto/omdb-search-response.dto';
 import { AppConfigService } from '../app-config/app-config.service';
 
 @Injectable()

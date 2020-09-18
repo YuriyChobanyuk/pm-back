@@ -7,5 +7,6 @@ import { AppConfigModule } from '../app-config/app-config.module';
   providers: [OmdbService],
   controllers: [OmdbController],
   imports: [HttpModule, AppConfigModule],
+  exports: [OmdbService],
 })
 export class OmdbModule {}

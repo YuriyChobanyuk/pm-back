@@ -1,5 +1,5 @@
-import { AppConfigModule } from './../app-config/app-config.module';
-import { AppConfigService } from './../app-config/app-config.service';
+import { AppConfigModule } from '../app-config/app-config.module';
+import { AppConfigService } from '../app-config/app-config.service';
 import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';

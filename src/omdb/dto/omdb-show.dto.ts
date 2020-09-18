@@ -6,8 +6,8 @@ import {
   IsEnum,
   IsOptional,
 } from 'class-validator';
-import { ShowType } from '../show-type.enum';
-import { ShowStatus } from '../show-status.enum';
+import { ShowType } from '../../show/show-type.enum';
+import { ShowStatus } from '../../show/show-status.enum';
 
 export class OmdbShowDto {
   @IsString()
