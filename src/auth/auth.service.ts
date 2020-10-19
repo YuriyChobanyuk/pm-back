@@ -10,7 +10,6 @@ import * as jwt from 'jsonwebtoken';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcryptjs';
 import { AppConfigService } from 'src/app-config/app-config.service';
-import { API_V1 } from 'src/common/constants';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -64,7 +63,7 @@ export class AuthService {
 
   generateRefreshToken(payload: JwtPayloadInterface): string {
     return jwt.sign(payload, this.configService.jwtConfig.refreshSecret, {
-      expiresIn: this.configService.jwtConfig.expiresIn,
+      expiresIn: this.configService.jwtConfig.refreshExpiresIn,
     });
   }
 
@@ -72,16 +71,34 @@ export class AuthService {
     try {
       jwt.verify(refreshToken, this.configService.jwtConfig.refreshSecret);
     } catch (e) {
+      console.log({
+        refreshVerificationError: e,
+        refreshToken,
+        secret: this.configService.jwtConfig.refreshSecret,
+      });
+
       throw new UnauthorizedException();
     }
 
     return jwt.decode(refreshToken) as JwtPayloadInterface;
   }
 
+  verifyExpiredAuthToken(authToken: string): void {
+    const parsedToken = this.parseBearerToken(authToken);
+
+    jwt.verify(parsedToken, this.configService.jwtConfig.secret, {
+      ignoreExpiration: true,
+    });
+  }
+
+  parseBearerToken(token: string) {
+    return token.split(' ')[1];
+  }
+
   get refreshTokenCookieOptions() {
     return {
-      maxAge: this.configService.jwtConfig.refreshExpiresIn * 1000,
-      expireAfterSeconds: this.configService.jwtConfig.refreshExpiresIn * 1000,
+      maxAge: 3600 * 1000,
+      expireAfterSeconds: 3600 * 1000,
       httpOnly: false,
       // should be set to true in real production
       secure: false,

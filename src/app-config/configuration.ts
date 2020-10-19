@@ -17,8 +17,8 @@ export const appConf = {
   },
   jwt: {
     secret: process.env.JWT_SECRET,
-    expiresIn: parseInt(process.env.JWT_EXPIRES_IN),
-    refreshExpiresIn: parseInt(process.env.JWT_REFRESH_EXPIRES_IN),
+    expiresIn: process.env.JWT_EXPIRES_IN,
+    refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
     refreshSecret: process.env.JWT_REFRESH_SECRET,
   },
   omdb: {

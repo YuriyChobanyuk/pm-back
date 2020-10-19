@@ -18,11 +18,18 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { AdminGuard } from '../auth/guards/admin.guard';
 import { API_V1 } from '../common/constants';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
+import { GetUser } from 'src/auth/get-user.decorator';
 
 @UseGuards(JwtAuthGuard)
 @Controller(`${API_V1}/users`)
 export class UserController {
   constructor(private userService: UserService) {}
+
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get('/current')
+  getCurrentUser(@GetUser() user: User): User {
+    return user;
+  }
 
   @UseGuards(AdminGuard)
   @UseInterceptors(ClassSerializerInterceptor)
