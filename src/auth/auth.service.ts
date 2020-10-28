@@ -11,6 +11,7 @@ import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcryptjs';
 import { AppConfigService } from 'src/app-config/app-config.service';
 import { JwtService } from '@nestjs/jwt';
+import * as ms from 'ms';
 
 @Injectable()
 export class AuthService {
@@ -96,9 +97,11 @@ export class AuthService {
   }
 
   get refreshTokenCookieOptions() {
+    const maxAge = ms(this.configService.jwtConfig.refreshExpiresIn);
+    const expireAfterSeconds = ms(this.configService.jwtConfig.refreshExpiresIn);
     return {
-      maxAge: 3600 * 1000,
-      expireAfterSeconds: 3600 * 1000,
+      maxAge,
+      expireAfterSeconds,
       httpOnly: false,
       // should be set to true in real production
       secure: false,
