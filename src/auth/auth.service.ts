@@ -72,12 +72,6 @@ export class AuthService {
     try {
       jwt.verify(refreshToken, this.configService.jwtConfig.refreshSecret);
     } catch (e) {
-      console.log({
-        refreshVerificationError: e,
-        refreshToken,
-        secret: this.configService.jwtConfig.refreshSecret,
-      });
-
       throw new UnauthorizedException();
     }
 
@@ -98,7 +92,9 @@ export class AuthService {
 
   get refreshTokenCookieOptions() {
     const maxAge = ms(this.configService.jwtConfig.refreshExpiresIn);
-    const expireAfterSeconds = ms(this.configService.jwtConfig.refreshExpiresIn);
+    const expireAfterSeconds = ms(
+      this.configService.jwtConfig.refreshExpiresIn,
+    );
     return {
       maxAge,
       expireAfterSeconds,

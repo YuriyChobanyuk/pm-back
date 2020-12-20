@@ -9,7 +9,7 @@ import { AppConfigService } from './app-config/app-config.service';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     cors: {
-      origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+      origin: [/http:\/\/localhost/, /http:\/\/127.0.0.1/],
       methods: 'GET, HEAD, PUT, PATCH, POST, DELETE, OPTIONS',
       preflightContinue: false,
       optionsSuccessStatus: 204,
