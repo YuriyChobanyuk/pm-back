@@ -56,7 +56,7 @@ export class AuthController {
     try {
       this.authService.verifyExpiredAuthToken(authToken);
     } catch (e) {
-      res.status(401).send('Invalid access token');
+      return res.status(401).send('Invalid access token');
     }
     try {
       user = await this.authService.refresh(refreshToken);
