@@ -10,15 +10,14 @@ import * as jwt from 'jsonwebtoken';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcryptjs';
 import { AppConfigService } from 'src/app-config/app-config.service';
-import { JwtService } from '@nestjs/jwt';
-import * as ms from 'ms';
+import ms from 'ms';
+import { CookieOptions } from 'express';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UserService,
     private configService: AppConfigService,
-    private jwtService: JwtService,
   ) {}
 
   async signUp(signUpDto: SignUpDto): Promise<User> {
@@ -86,18 +85,19 @@ export class AuthService {
     });
   }
 
-  parseBearerToken(token: string) {
+  parseBearerToken(token: string): string {
     return token.split(' ')[1];
   }
 
-  get refreshTokenCookieOptions() {
+  get refreshTokenCookieOptions(): CookieOptions {
     const maxAge = ms(this.configService.jwtConfig.refreshExpiresIn);
-    const expireAfterSeconds = ms(
+    const expireAfterMilliseconds = ms(
       this.configService.jwtConfig.refreshExpiresIn,
     );
+
     return {
       maxAge,
-      expireAfterSeconds,
+      expires: new Date(Date.now() + expireAfterMilliseconds),
       httpOnly: false,
       // should be set to true in real production
       secure: false,

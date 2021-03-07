@@ -14,7 +14,7 @@ export class OmdbShowResponseDto {
 
   @Expose({ name: 'genre', toPlainOnly: true })
   @Transform(
-    value => {
+    ({ value }) => {
       return value ? value.split(', ') : [];
     },
     { toClassOnly: true },
@@ -29,7 +29,7 @@ export class OmdbShowResponseDto {
 
   @Expose()
   @Transform(
-    (value: string) => {
+    ({ value }) => {
       if (!value || !Number.isNaN(parseInt(value))) {
         return -1;
       }

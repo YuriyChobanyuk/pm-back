@@ -17,6 +17,7 @@ import { plainToClass } from 'class-transformer';
 import { User } from '../user/user.entity';
 import { LoginDto } from './dto/login.dto';
 import { AppConfigService } from '../app-config/app-config.service';
+import { IAuthResponse } from './auth-response.interface';
 
 @Controller('api/v1/auth')
 export class AuthController {
@@ -30,21 +31,27 @@ export class AuthController {
   async signUp(
     @Body(ValidationPipe) signUpDto: SignUpDto,
     @Res() res: Response,
-  ) {
+  ): Promise<IAuthResponse> {
     const user = await this.authService.signUp(signUpDto);
 
-    return this.sendToken(res, user);
+    return this.sendUser(res, user);
   }
 
   @Post('/login')
-  async login(@Body(ValidationPipe) loginDto: LoginDto, @Res() res: Response) {
+  async login(
+    @Body(ValidationPipe) loginDto: LoginDto,
+    @Res() res: Response,
+  ): Promise<IAuthResponse> {
     const user = await this.authService.login(loginDto);
 
-    return this.sendToken(res, user);
+    return this.sendUser(res, user);
   }
 
   @Get('/refresh')
-  async refresh(@Req() req: Request, @Res() res: Response) {
+  async refresh(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<IAuthResponse> {
     const refreshToken = req.cookies['refreshToken'];
     const authToken = req.headers.authorization;
 
@@ -52,22 +59,20 @@ export class AuthController {
       throw new UnauthorizedException();
     }
 
-    let user: User;
     try {
       this.authService.verifyExpiredAuthToken(authToken);
     } catch (e) {
-      return res.status(401).send('Invalid access token');
+      throw new UnauthorizedException('Invalid access token');
     }
     try {
-      user = await this.authService.refresh(refreshToken);
+      const user = await this.authService.refresh(refreshToken);
+      return this.sendUser(res, user);
     } catch (e) {
-      return res.status(401).send('Invalid refresh token');
+      throw new UnauthorizedException('Invalid refresh token');
     }
-
-    return this.sendToken(res, user);
   }
 
-  private sendToken(res: Response, user: User): Response {
+  private sendUser(res: Response, user: User): IAuthResponse {
     const { id, name, role } = user;
 
     const payload: JwtPayloadInterface = {
@@ -77,20 +82,27 @@ export class AuthController {
     };
 
     const token = this.jwtService.sign(payload);
+
+    this.setRefreshTokenCookie(res, payload);
+
+    return {
+      token,
+      data: {
+        user: plainToClass(User, user),
+      },
+    };
+  }
+
+  private setRefreshTokenCookie(
+    res: Response,
+    payload: JwtPayloadInterface,
+  ): void {
     const refreshToken = this.authService.generateRefreshToken(payload);
 
-    return res
-      .cookie(
-        'refreshToken',
-        refreshToken,
-        this.authService.refreshTokenCookieOptions,
-      )
-      .status(200)
-      .json({
-        token,
-        data: {
-          user: plainToClass(User, user),
-        },
-      });
+    res.cookie(
+      'refreshToken',
+      refreshToken,
+      this.authService.refreshTokenCookieOptions,
+    );
   }
 }
